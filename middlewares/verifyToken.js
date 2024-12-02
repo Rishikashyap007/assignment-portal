@@ -1,38 +1,47 @@
-// first we will get the token from the headers or cokkies
-// then decode the token using jwt verify
-// then find the user using the id we send in the payload of the token 
-// and send that user to next controller and finally the next to shift the control to the next controller 
-
 import jwt from "jsonwebtoken";
 import ApiError from "../utils/ApiError.js";
 import { User } from "../models/userModel.js";
 
-
-const verifyToken = async(req,res,next)=>{
+// Middleware to verify JWT token and authorize users
+const verifyToken = async (req, res, next) => {
   try {
-     const token  = req.cookies?.userToken;
+    // Extract the token from cookies
+    const token = req.cookies?.userToken;
 
-     if(!token){
-        throw new ApiError(401,"User not authorized")
-     }
+    // Check if the token exists
+    if (!token) {
+      // If no token is provided, throw an authorization error
+      throw new ApiError(401, "User not authorized");
+    }
 
-     const decodedToken = jwt.verify(token,process.env.JWT_SECRET)
+    // Verify the token using the secret key
+    const decodedToken = jwt.verify(token, process.env.JWT_SECRET);
 
-     if(!decodedToken){
-        throw new ApiError(401,"User not authorized")
-     }
+    // If the token cannot be verified, throw an authorization error
+    if (!decodedToken) {
+      throw new ApiError(401, "User not authorized");
+    }
 
-     const user = await User.findById(decodedToken.id)
+    // Find the user in the database using the ID from the decoded token
+    const user = await User.findById(decodedToken.id);
 
-     if(!user){
-        throw new ApiError(404,"User not Found")
-     }
-     req.user = user;
-     next()
+    // If no user is found, throw a "User not found" error
+    if (!user) {
+      throw new ApiError(404, "User not Found");
+    }
+
+    // Attach the user object to the request object for further use
+    req.user = user;
+
+    // Pass control to the next middleware or route handler
+    next();
   } catch (error) {
-    console.error("Error in verifyjwt middleware:", error); 
+    // Log the error for debugging purposes
+    console.error("Error in verifyToken middleware:", error);
+
+    // Pass the error to the next middleware (error handling middleware)
     next(error);
   }
-}
+};
 
 export default verifyToken;

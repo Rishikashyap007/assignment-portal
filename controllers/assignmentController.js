@@ -2,6 +2,7 @@ import { Assignment } from "../models/assignmentModel.js";
 import ApiError from "../utils/ApiError.js";
 import ApiResponse from "../utils/ApiResponse.js";
 
+// Controller to get assignments
 export const getAssignments = async (req, res) => {
     try {
         // Validate that user is authenticated
@@ -32,75 +33,83 @@ export const getAssignments = async (req, res) => {
         // Centralized error handling
         console.error("Get Assignments Error:", error);
 
-        const statusCode = error.statusCode || 500;
-        const errorMessage = error.message || "Internal Server Error";
+        const statusCode = error.statusCode || 500; // Determine the status code
+        const errorMessage = error.message || "Internal Server Error"; // Determine the error message
 
         return res.status(statusCode).json(
-            new ApiError(statusCode, errorMessage)
+            new ApiError(statusCode, errorMessage) // Send error response
         );
     }
 };
 
+// Controller to accept an assignment
 export const acceptAssignment = async (req, res) => {
     try {
-      const { id } = req.params;
-       console.log(id,"idd");
-      // Find the assignment by ID and ensure it's tagged to the current admin
-      const assignment = await Assignment.findOne({
-        _id: id,
-        adminId: req.user._id,
-      });
-      console.log(assignment,"assignment huu");
-  
-      if (!assignment) {
-        throw new ApiError(404,"Assignment not found")
-      }
+        const { id } = req.params; // Extract assignment ID from request parameters
+        console.log(id, "idd");
 
-  
-      // Update the assignment status to "accepted"
-      assignment.status = "Accepted";
-      await assignment.save();
-  
-      res.status(200).json(new ApiResponse(200,assignment,"assignment Accepted Successfully"));
+        // Find the assignment by ID and ensure it's tagged to the current admin
+        const assignment = await Assignment.findOne({
+            _id: id,
+            adminId: req.user._id, // Ensure the assignment belongs to the current admin
+        });
+        console.log(assignment, "assignment huu");
+
+        // Check if assignment exists
+        if (!assignment) {
+            throw new ApiError(404, "Assignment not found");
+        }
+
+        // Update the assignment status to "accepted"
+        assignment.status = "Accepted";
+        await assignment.save(); // Save the updated assignment
+
+        // Send successful response
+        res.status(200).json(new ApiResponse(200, assignment, "Assignment Accepted Successfully"));
     } catch (error) {
+        // Centralized error handling
         console.error("Get Assignments Error:", error);
 
-        const statusCode = error.statusCode || 500;
-        const errorMessage = error.message || "Internal Server Error";
+        const statusCode = error.statusCode || 500; // Determine the status code
+        const errorMessage = error.message || "Internal Server Error"; // Determine the error message
 
         return res.status(statusCode).json(
-            new ApiError(statusCode, errorMessage)
+            new ApiError(statusCode, errorMessage) // Send error response
         );
     }
-  };
+};
 
-  export const rejectAssignment = async (req, res) => {
+// Controller to reject an assignment
+export const rejectAssignment = async (req, res) => {
     try {
-      const { id } = req.params;
-  
-      // Find the assignment by ID and ensure it's tagged to the current admin
-      const assignment = await Assignment.findOne({
-        _id: id,
-        // admin: req.user._id,
-      });
-  
-      if (!assignment) {
-        throw new ApiError(404,"Assignment not found")
-      }
-  
-      // Update the assignment status to "accepted"
-      assignment.status = "Rejected";
-      await assignment.save();
-  
-      res.status(200).json(new ApiResponse(200,assignment,"assignment rejected Successfully"));
+        const { id } = req.params; // Extract assignment ID from request parameters
+
+        // Find the assignment by ID and ensure it's tagged to the current admin
+        const assignment = await Assignment.findOne({
+            _id: id,
+            admin: req.user._id, 
+        });
+
+        // Check if assignment exists
+        if (!assignment) {
+            throw new ApiError(404, "Assignment not found");
+        }
+
+        // Update the assignment status to "rejected"
+        assignment.status = "Rejected";
+        await assignment.save(); // Save the updated assignment
+
+        // Send successful response
+        res.status(200).json(new ApiResponse(200, assignment, "Assignment rejected Successfully"));
     } catch (error) {
+        // Centralized error handling
         console.error("Get Assignments Error:", error);
 
-        const statusCode = error.statusCode || 500;
-        const errorMessage = error.message || "Internal Server Error";
+        const statusCode = error.statusCode || 500; // Determine the status code
+        const errorMessage = error.message || "Internal Server Error"; // Determine the error message
 
         return res.status(statusCode).json(
-            new ApiError(statusCode, errorMessage)
+            new ApiError(statusCode, errorMessage) // Send error response
         );
     }
-  };
+};
