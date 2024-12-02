@@ -82,7 +82,7 @@ The API uses **JWT (JSON Web Tokens)** for authentication. When a user logs in, 
 
 ### Example:
 ```bash
-Authorization: Bearer <JWT-TOKEN>
+Authorization: <JWT-TOKEN>
 ```
 
 For admin routes, the user must have the role `admin` to access them. The `isAdmin` middleware ensures this.
@@ -208,7 +208,7 @@ The response will include a JWT token:
 
 ```bash
 GET http://localhost:5000/api/admin/assignments
-Authorization: Bearer <JWT-TOKEN-HERE>
+Authorization:  <JWT-TOKEN-HERE>
 ```
 
 ---
